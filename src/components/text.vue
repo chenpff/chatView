@@ -4,7 +4,6 @@
         props: [
             'user',//用户自己
             'sessionUser',//聊天用户
-            'sessionMessage',//聊天消息
         ],
         data () {
             return {
@@ -25,17 +24,15 @@
                     */
 
                     let item = {
-                        sessionType: 1,
+                        sessionType: this.sessionUser.type,
                         sessionId: this.sessionUser.id,
                         message: this.text,
                         fromId: this.user.id,
                         serverMessageId: 0,
                         isRead: 1
                     };
-
-                    this.sessionMessage.push(item);
+                    console.log(item,'item-add')
                     this.$emit('sendMessage', item);
-
                     this.text = '';
                 }
             }
@@ -53,7 +50,7 @@
     .m-text {
         height: 160px;
         border-top: solid 1px #ddd;
-        
+
         textarea {
             padding: 10px;
             height: 100%;

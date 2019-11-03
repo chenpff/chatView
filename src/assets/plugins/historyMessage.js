@@ -37,40 +37,29 @@ export default {
             }
         )
     },
-    get: function () {
+    get: function (fn) {
         db.init(function (db) {
             let objectStore = db.transaction('history').objectStore('history');
             objectStore.openCursor().onsuccess = function (event) {
-                var cursor = event.target.result;
-
+                let cursor = event.target.result;
+                let message = [];
                 if (cursor) {
-                    console.log('Id: ' + cursor.key);
-                    console.log('Name: ' + cursor.value.message);
+                    let a = {
+                      id: cursor.key,
+                      sessionType: cursor.value.sessionType,
+                      sessionId: cursor.value.sessionId,
+                      message: cursor.value.message,
+                      fromId: cursor.value.fromId,
+                      serverMessageId: cursor.value.serverMessageId,
+                      isRead: cursor.value.isRead,
+                    }
+                    fn(a);
                     cursor.continue();
                 } else {
-                    console.log('没有更多数据了！');
+
                 }
             };
         });
-    },
-    set:function (message,newMessage) {
-        if(!newMessage){
-            return ;
-        }
-
-        if(!this.history[message.sessionUser.id]){
-            this.history[message.sessionUser.id] = {
-                'type':1,//单聊，群聊
-                'sessionUser':message.sessionUser,
-                'messages':[]
-            };
-        }
-
-        newMessage.map((item)=>{
-            this.history[message.sessionUser.id]['messages'].push(item);
-        });
-        console.log(this.history,'store');
-        store.set('historyMessage',this.history);
     },
     search:function () {
 

@@ -24,7 +24,7 @@
             <p class="name">{{user.name}}</p>
         </header>
         <footer>
-            <input class="search" type="text" placeholder="search user..." v-model="nowSearch">
+            <input class="search" type="text" placeholder="搜索..." v-model="nowSearch">
         </footer>
     </div>
 </template>
@@ -33,11 +33,11 @@
     .m-card {
         padding: 12px;
         border-bottom: solid 1px #24272C;
-        
+
         footer {
             margin-top: 10px;
         }
-        
+
         .avatar, .name {
             vertical-align: middle;
         }

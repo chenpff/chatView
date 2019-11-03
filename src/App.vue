@@ -1,14 +1,16 @@
 <script>
     import user from './assets/plugins/user'
     import userList from './assets/plugins/userList'
+    import teamList from './assets/plugins/teamList'
     import store from './assets/plugins/store';
-    import sessionMessage from './assets/plugins/sessionMessage';
     import historyMessage from './assets/plugins/historyMessage';
 
     import card from './components/card';
     import list from './components/list';
+    import tList from './components/teamList';
     import xtext from './components/text';
     import message from './components/message';
+    import tab from './components/tab';
 
     export default {
         data () {
@@ -18,40 +20,43 @@
             if(!localSessionUser){
                 localSessionUser = {}
             }
-
             return {
                 user: user,// 当前登录用户，通过url userId获得
-                userList: userList, //用户列表
+                userList: userList, //历史会话用户列表
+                teamList: teamList, //历史会话用户列表
 
                 sessionUser: localSessionUser,
-                sessionMessage: [],
-                search: ''// 搜索key
+                search: '',// 搜索key
+                check:1,//默认展示单聊
             };
         },
         watch: {
-            // 监听聊天记录，保存到localStorage中
-            sessionMessage: {
+            // 监听聊天记录，当前会话消息保存到localStorage中
+            sessionUser: {
                 deep: true,
                 handler (after) {
-                    console.log(after, 'after');
-                    // sessionMessage.save();
+                    store.set('sessionUser',after);
                 }
+            },
+            check(val){
+                console.log(val);
             }
         },
         methods:{
             onSessionUser: function(val){
                 this.sessionUser = val;
                 store.set('sessionUser',this.sessionUser);
-
-                this.sessionMessage = historyMessage.get();
             },
             sendMessage: function (item) {
-                console.log(item, 'add');
+                this.sessionUser.message.push(item);
                 historyMessage.add(item);
+            },
+            onCheckChange:function (val) {
+                this.check = val;
             }
         },
         components: {
-            card, list, xtext, message
+            card, list, xtext, message,tList,tab
         }
 
     };
@@ -62,14 +67,15 @@
   <div id="chat">
     <div class="sidebar">
       <card :user="user" :search.sync="search"></card>
-      <list :user-list="userList" :session-user.sync="sessionUser" :search="search" @onSessionUser="onSessionUser"></list>
+      <tab :check.sync="check"></tab>
+
+      <list v-if="check === 1" :user-list="userList" :session-user.sync="sessionUser" :search="search" @onSessionUser="onSessionUser"></list>
+      <tList v-if="check === 2" :team-list="teamList" :session-user.sync="sessionUser" :search="search" @onSessionUser="onSessionUser"></tList>
     </div>
     <div class="main">
-      <message :sessionMessage="sessionMessage" :user="user" :session-user="sessionUser"></message>
-      <xtext :sessionMessage="sessionMessage" :user="user" :session-user="sessionUser"
-             @sendMessage="sendMessage"></xtext>
+      <message :user="user" :session-user="sessionUser"></message>
+      <xtext :user="user" :session-user="sessionUser" @sendMessage="sendMessage"></xtext>
     </div>
-
   </div>
 </template>
 
