@@ -10,13 +10,13 @@ import db from './db';
     message //消息
     fromId //谁发的
     serverMessageId //服务端消息Id
-    isRead //是否已读
+    isRead //是否已读,
+    time //消息毫秒时间戳
 */
 
 
 export default {
-    history:[],
-    add: function (item) {
+    add: function (item,fn) {
         db.init(
             function (db) {
                 let objectStore;
@@ -30,6 +30,7 @@ export default {
                     .objectStore('history').add(item);
                 request.onsuccess = function (event) {
                     console.log('数据写入成功');
+                    fn(request);
                 };
                 request.onerror = function (event) {
                     console.log('数据写入失败');
@@ -52,6 +53,7 @@ export default {
                       fromId: cursor.value.fromId,
                       serverMessageId: cursor.value.serverMessageId,
                       isRead: cursor.value.isRead,
+                      time: cursor.value.time,
                     }
                     fn(a);
                     cursor.continue();
@@ -60,6 +62,18 @@ export default {
                 }
             };
         });
+    },
+    put:function(item){
+      db.init((db)=>{
+        let objectStore = db.transaction(['history'], 'readwrite').objectStore('history');
+        let request = objectStore.put(item);
+        request.onsuccess = function (event) {
+          console.log('数据更新成功');
+        };
+        request.onerror = function (event) {
+          console.log('数据更新失败');
+        }
+      });
     },
     search:function () {
 

@@ -14,13 +14,13 @@
             sendMessage (e) {
                 if (e.ctrlKey && e.keyCode === 13 && this.text.length) {
                     /*
-
                         sessionType //会话类型 群聊，单聊
                         sessionId //会话id  teamId  userId
                         message //消息
                         fromId //谁发的
                         serverMessageId //服务端消息Id
                         isRead //是否已读
+                        time //毫秒时间戳
                     */
 
                     let item = {
@@ -29,7 +29,8 @@
                         message: this.text,
                         fromId: this.user.id,
                         serverMessageId: 0,
-                        isRead: 1
+                        isRead: 1,
+                        time:new Date().getTime(),
                     };
                     console.log(item,'item-add')
                     this.$emit('sendMessage', item);
@@ -42,7 +43,8 @@
 
 <template>
     <div class="m-text">
-        <textarea placeholder="按 Ctrl + Enter 发送" v-model="text" @keyup="sendMessage"></textarea>
+        <textarea v-if="!sessionUser.id" disabled placeholder="按 Ctrl + Enter 发送" v-model="text" @keyup="sendMessage"></textarea>
+        <textarea v-else placeholder="按 Ctrl + Enter 发送" v-model="text" @keyup="sendMessage"></textarea>
     </div>
 </template>
 

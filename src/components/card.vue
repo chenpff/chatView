@@ -20,7 +20,7 @@
 <template>
     <div class="m-card">
         <header>
-            <img class="avatar" width="40" height="40" :alt="user.name" :src="user.avatar">
+            <img class="avatar" width="50" height="50" :alt="user.name" :src="user.avatar">
             <p class="name">{{user.name}}</p>
         </header>
         <footer>

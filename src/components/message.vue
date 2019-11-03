@@ -1,13 +1,23 @@
 <script>
     import Vue from 'Vue';
+    import helper from "../assets/plugins/helper";
     let _this ;
     export default {
         props: ['user', 'sessionUser'],
         data:function(){
             _this = this;
             return  {
-
+                search:'',
+                message:this.sessionUser.message,
             };
+        },
+        watch:{
+            sessionUser(){
+                this.message = this.sessionUser.message;
+            },
+            search(search){
+                this.message = this.sessionUser.message.filter((item)=> item.message.indexOf(search) > -1);
+            }
         },
         filters: {
             // 筛选出用户头像
@@ -16,9 +26,9 @@
                 return user && user.avatar;
             },
             // 将日期过滤为 hour:minutes
-            time() {
-                let date = new Date();
-                return date.getHours() + ':' + date.getMinutes();
+            time(item) {
+                let date = new Date(item.time);
+                return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
             }
         },
         directives: {
@@ -28,29 +38,45 @@
                     el.scrollTop = el.scrollHeight - el.clientHeight;
                 });
             }
+        },
+        methods:{
+            searchLine(e){
+                console.log(e,'e');
+                console.log(e.scrollHeight,'e');
+            }
         }
     };
 </script>
 
 <template>
-    <div class="m-message" v-scroll-bottom="sessionUser.message">
-        <ul>
-            <li v-for="item in sessionUser.message">
-                <p class="time" v-if=false><span>{{item.date | time}}</span></p>
-                <div class="main" :class="{ self: item.fromId === user.id }">
-                    <img class="avatar" width="30" height="30" :src="item | avatar" />
-                    <div class="text">{{item.message}}</div>
-                </div>
-            </li>
-        </ul>
+    <div class="box">
+        <div class="m-message" v-scroll-bottom="message">
+            <ul>
+                <li v-for="item in message">
+                    <p class="time" v-if=false><span>{{item.time | time}}</span></p>
+                    <div class="main" :class="{ self: item.fromId === user.id }">
+                        <img class="avatar" width="30" height="30" :src="item | avatar" />
+                        <div class="text">{{item.message}}<span v-if="search">  |  {{item | time}}</span></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="tools">
+          <input class="search" type="text" placeholder="搜索历史记录..." v-model="search">
+        </div>
     </div>
 </template>
 
 <style lang="less">
+    .box{
+      position:relative ;
     .m-message {
-        padding: 10px 15px;
+        height: ~'calc(100% - 35px)' ;
+        padding: 15px;
         overflow-y: scroll;
 
+        ul{
+        }
         li {
             margin-bottom: 15px;
         }
@@ -93,6 +119,8 @@
                 border: 6px solid transparent;
                 border-right-color: #fafafa;
             }
+            >span{
+            }
         }
 
         .self {
@@ -113,5 +141,22 @@
                 }
             }
         }
+    }
+      .tools{
+          position: absolute;
+          height: 35px;
+          bottom: 0px;
+          left: 0;
+          right: 0;
+        .search{
+          display: inline-block;
+          height: 25px;
+          border: 0px;
+          padding: 3px 5px;
+          margin: 3px 0 2px 0;
+          font-size: smaller;
+          float: right;
+        }
+      }
     }
 </style>

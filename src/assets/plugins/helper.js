@@ -24,7 +24,7 @@ var helper = {
 
     // 日期处理
     formatTime: function (time) {
-        var result = [];
+        let result = [];
         time = window.parseInt(time);
         if (time / 1440 >= 1) {
             result.push(Math.floor(time / 1440) + '天');

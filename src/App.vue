@@ -20,6 +20,7 @@
             if(!localSessionUser){
                 localSessionUser = {}
             }
+
             return {
                 user: user,// 当前登录用户，通过url userId获得
                 userList: userList, //历史会话用户列表
@@ -48,11 +49,26 @@
                 store.set('sessionUser',this.sessionUser);
             },
             sendMessage: function (item) {
+                let _this = this;
+                historyMessage.add(item,(e)=>{
+                    item.id = e.result;
+                    _this.sessionUser.message.push(item);
+                });
+
+                //this.sendOne("测试。。");
+            },
+            sendOne(m){
+                let item = {
+                    sessionType: 1,
+                    sessionId: 2,
+                    message: m,
+                    fromId: 2,
+                    serverMessageId: 0,
+                    isRead: 0
+                };
+                if(this.sessionUser.id === item.sessionId) item.isRead = 1;//判断当前聊天窗口打开的情况下未读数不++
                 this.sessionUser.message.push(item);
                 historyMessage.add(item);
-            },
-            onCheckChange:function (val) {
-                this.check = val;
             }
         },
         components: {
@@ -89,7 +105,7 @@
     }
     .sidebar {
       float: left;
-      width: 200px;
+      width: 230px;
       color: #f4f4f4;
       background-color: #2e3238;
     }
@@ -104,7 +120,7 @@
       bottom: 0;
       left: 0;
     }
-    .m-message {
+    .box {
       height: ~'calc(100% - 160px)';
     }
   }
