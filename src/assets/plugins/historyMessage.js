@@ -16,7 +16,7 @@ import db from './db';
 
 
 export default {
-    add: function (item,fn) {
+    add: function (item, fn) {
         db.init(
             function (db) {
                 let objectStore;
@@ -39,43 +39,58 @@ export default {
         )
     },
     get: function (fn) {
-        db.init(function (db) {
-            let objectStore = db.transaction('history').objectStore('history');
-            objectStore.openCursor().onsuccess = function (event) {
-                let cursor = event.target.result;
-                let message = [];
-                if (cursor) {
-                    let a = {
-                      id: cursor.key,
-                      sessionType: cursor.value.sessionType,
-                      sessionId: cursor.value.sessionId,
-                      message: cursor.value.message,
-                      fromId: cursor.value.fromId,
-                      serverMessageId: cursor.value.serverMessageId,
-                      isRead: cursor.value.isRead,
-                      time: cursor.value.time,
-                    }
-                    fn(a);
-                    cursor.continue();
-                } else {
-
+        db.init(
+            function (db) {
+                let objectStore;
+                if (!db.objectStoreNames.contains('history')) {
+                    objectStore = db.createObjectStore('history', {autoIncrement: true, keyPath: 'id'});
+                    objectStore.createIndex('message', 'message', {unique: false});
                 }
-            };
-        });
+            },
+            function (db) {
+                let objectStore = db.transaction('history').objectStore('history');
+                objectStore.openCursor().onsuccess = function (event) {
+                    let cursor = event.target.result;
+                    if (cursor) {
+                        let item = {
+                            id: cursor.key,
+                            sessionType: cursor.value.sessionType,
+                            sessionId: cursor.value.sessionId,
+                            message: cursor.value.message,
+                            fromId: cursor.value.fromId,
+                            serverMessageId: cursor.value.serverMessageId,
+                            isRead: cursor.value.isRead,
+                            time: cursor.value.time,
+                        }
+                        fn(item);
+                        cursor.continue();
+                    } else {
+
+                    }
+                };
+            });
     },
-    put:function(item){
-      db.init((db)=>{
-        let objectStore = db.transaction(['history'], 'readwrite').objectStore('history');
-        let request = objectStore.put(item);
-        request.onsuccess = function (event) {
-          console.log('数据更新成功');
-        };
-        request.onerror = function (event) {
-          console.log('数据更新失败');
-        }
-      });
+    put: function (item) {
+        db.init(
+            (db) => {
+                let objectStore;
+                if (!db.objectStoreNames.contains('history')) {
+                    objectStore = db.createObjectStore('history', {autoIncrement: true, keyPath: 'id'});
+                    objectStore.createIndex('message', 'message', {unique: false});
+                }
+            },
+            (db) => {
+                let objectStore = db.transaction(['history'], 'readwrite').objectStore('history');
+                let request = objectStore.put(item);
+                request.onsuccess = function (event) {
+                    console.log('数据更新成功');
+                };
+                request.onerror = function (event) {
+                    console.log('数据更新失败');
+                }
+            });
     },
-    search:function () {
+    search: function () {
 
     }
 };

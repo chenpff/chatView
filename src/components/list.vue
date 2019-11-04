@@ -191,6 +191,7 @@
           margin: 0px 0px 5px 10px;
           font-size: smaller;
           color:#928e8e;
+            height: 10px;
         }
         .avatar {
             border-radius: 2px;
